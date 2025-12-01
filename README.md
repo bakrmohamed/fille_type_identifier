@@ -34,14 +34,108 @@ python file_identifier.py
 # When prompted, enter any filename:
 Enter filename (or 'quit' to exit): yourfile.ext
 
-## Complete Usage Guide
-#Basic Commands
 
-When the program is running, you can use these commands:
-Command	Description
-filename	Analyze a single file
-file1 file2	Analyze multiple files (space separated)
-quit or q	Exit the program
-help or h	Show help message
-list or ls	Show files in current directory
-clear	Clear the screen
+##  Examples
+
+# Analyze a single file
+Enter filename: image.jpg
+
+# Analyze multiple files
+Enter filename: document.pdf archive.zip music.mp3
+
+# Use full paths
+Enter filename: /home/user/documents/report.pdf
+Enter filename: C:\Users\Name\Downloads\file.exe
+
+# Analyze all files in current directory
+Enter filename: *
+
+What It Detects
+Security Threats
+
+    Disguised Executables: .exe files renamed as .pdf, .jpg, .doc
+
+    Malware Delivery: Files with double extensions like invoice.pdf.exe
+
+    Spoofed Files: Files pretending to be something they're not
+
+    Unknown Binary Files: Unrecognized or suspicious file types
+
+File Information
+
+    Real File Type: Actual format determined by magic bytes
+
+    MIME Type: Internet media type (e.g., image/jpeg)
+
+    File Description: Detailed information about the file
+
+    Extension Match: Whether file extension matches actual content
+
+    Security Status: Flag suspicious files with warnings
+
+
+
+Example Output
+
+Normal File Analysis
+
+========================================
+ FILE ANALYSIS RESULTS
+========================================
+
+ File Information:
+   Name:      photo.jpg
+   Size:      1,245,678 bytes
+   Modified:  2024-01-15 14:30:25
+   Extension: .jpg
+
+ Identification Results:
+   Type:        JPEG Image
+   MIME Type:   image/jpeg
+   Description: JPEG image data, JFIF standard 1.01
+   Method:      python-magic
+   Confidence:  High
+
+ Validation:
+   File extension matches detected type
+
+ First 32 bytes (HEX):
+   FF D8 FF E0 00 10 4A 46 49 46 00 01 01 00 00 01
+========================================
+
+Supported File Types
+With python-magic (1000+ types):
+
+    Images: JPEG, PNG, GIF, BMP, WebP, TIFF, ICO, SVG
+
+    Documents: PDF, DOC, DOCX, XLS, XLSX, PPT, PPTX, RTF, ODT
+
+    Archives: ZIP, RAR, 7Z, TAR, GZ, BZ2, XZ
+
+    Media: MP3, MP4, AVI, MKV, FLV, WAV, OGG, WEBM
+
+    Executables: EXE, DLL, SO, ELF, MSI, APP, DMG
+
+    Text: TXT, HTML, CSS, JS, JSON, XML, CSV, YAML
+
+    Database: SQLite, MySQL dumps, PostgreSQL
+
+    System: ISO, IMG, VHD, VMDK
+
+Without python-magic (20+ types):
+
+    JPEG, PNG, GIF, BMP
+
+    PDF, DOC
+
+    ZIP, RAR, 7Z
+
+    MP3, MP4
+
+    EXE
+
+    UTF-8/16 text files
+
+
+
+
