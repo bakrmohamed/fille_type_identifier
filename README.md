@@ -19,7 +19,7 @@ A simple yet powerful Blue Team security tool that identifies real file types by
 
 ```bash
 # Clone the repository
-git clone https://github.com/yourusername/file-type-identifier.git
+git clone https://github.com/bakrmohamed/file-type-identifier.git
 cd file-type-identifier
 
 # Install python-magic for best accuracy (optional but recommended)
