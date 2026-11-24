@@ -1,17 +1,10 @@
-from setuptools import setup, find_packages
+from setuptools import setup
 
 setup(
     name="file-identifier",
-    version="1.0.0",
-    description="A simple file identification and analysis tool.",
-    author="Your Name",
-    packages=find_packages(),
-    install_requires=[
-        "python-magic",
-    ],
-    entry_points={
-        "console_scripts": [
-            "file-identifier=file_identifier:main",
-        ]
-    },
+    version="1.0.1",
+    description="File signature inspection with an optional libmagic backend",
+    py_modules=["fille_type_identifier"],
+    extras_require={"magic": ["python-magic>=0.4.27,<0.5"]},
+    entry_points={"console_scripts": ["file-identifier=fille_type_identifier:main"]},
 )
