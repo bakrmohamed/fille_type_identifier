@@ -13,10 +13,8 @@ from datetime import datetime
 try:
     import magic
     MAGIC_AVAILABLE = True
-except ImportError:
+except (ImportError, OSError):
     MAGIC_AVAILABLE = False
-    print("  'python-magic' library not found. Using built-in signatures.")
-    print("   To install: pip install python-magic (or python-magic-bin for Windows)")
 
 # Built-in signatures database (fallback if magic library not available)
 FILE_SIGNATURES = {
@@ -29,7 +27,7 @@ FILE_SIGNATURES = {
     
     # Documents
     b'%PDF': {'name': 'PDF', 'ext': '.pdf', 'mime': 'application/pdf'},
-    b'\xd0\xcf\x11\xe0\xa1\xb1\x1a\xe1': {'name': 'DOC', 'ext': '.doc', 'mime': 'application/msword'},
+    b'\xd0\xcf\x11\xe0\xa1\xb1\x1a\xe1': {'name': 'OLE Compound', 'ext': None, 'mime': 'application/x-ole-storage'},
     
     # Archives
     b'PK\x03\x04': {'name': 'ZIP', 'ext': '.zip', 'mime': 'application/zip'},
@@ -148,12 +146,16 @@ class FileIdentifier:
     def analyze_file(self, filepath):
         """Complete file analysis"""
         # Check if file exists
-        if not os.path.exists(filepath):
+        if not os.path.isfile(filepath):
             return {
                 'error': f"File '{filepath}' does not exist",
                 'success': False
             }
         
+        header_check = self.read_file_header(filepath)
+        if header_check is None:
+            return {'success': False, 'error': 'File could not be read'}
+
         # Get file info
         file_info = {
             'filename': os.path.basename(filepath),
@@ -169,6 +171,9 @@ class FileIdentifier:
         else:
             result = self.identify_with_signatures(filepath)
         
+        if result is None and self.using_magic:
+            result = self.identify_with_signatures(filepath)
+
         # Read file header for display
         header_data = self.read_file_header(filepath, 32)
         
@@ -192,12 +197,12 @@ class FileIdentifier:
                     'confidence': 'none'
                 },
                 'header_bytes': header_data,
-                'extension_match': False
+                'extension_match': None
             }
     
     def check_extension_match(self, actual_extension, identification):
         """Check if file extension matches identified type"""
-        if not actual_extension:
+        if not actual_extension or identification.get('type') in ('Unknown', 'OLE Compound', 'RIFF'):
             return None
         
         # Common extension to type mapping
@@ -227,7 +232,7 @@ class FileIdentifier:
                 if expected.upper() in identified_type:
                     return True
         
-        return False
+        return False if actual_extension in extension_map else None
     
     def display_results(self, analysis):
         """Display analysis results"""
@@ -266,7 +271,7 @@ class FileIdentifier:
                 print(f"\n Extension matches file content")
             else:
                 print(f"\n  WARNING: Extension doesn't match file content!")
-                print(f"   The file might have been renamed or is suspicious")
+                print('   A mismatch is not proof of malware.')
         
         # Show first bytes
         if analysis['header_bytes']:
@@ -351,8 +356,8 @@ def main():
         if not user_input:
             continue
         
-        # Handle multiple files separated by space
-        if ' ' in user_input:
+        # Existing paths take priority, including names containing spaces.
+        if ' ' in user_input and not os.path.exists(user_input):
             files = user_input.split()
             print(f"\n Analyzing {len(files)} file(s)...")
             
